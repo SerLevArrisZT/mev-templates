@@ -20,8 +20,9 @@ async fn main() -> Result<()> {
     let env = Env::new();
 
     // Start async websocket streams
-    let ws = Ws::connect(env.wss_url).await?;
-    let provider = Arc::new(Provider::new(ws));
+    use ethers::providers::Ipc;
+    let ipc = Ipc::connect(env.rpc_sock).await?;
+    let provider = Arc::new(Provider::new(ipc));
 
     let (event_sender, _): (Sender<Event>, _) = broadcast::channel(512);
 
