@@ -6,7 +6,7 @@ use cfmms::{
 };
 use csv::StringRecord;
 use ethers::{
-    providers::{Provider, Ws},
+    providers::{Provider, Ipc},
     types::H160,
 };
 use log::info;
@@ -66,7 +66,7 @@ impl Pool {
 }
 
 pub async fn load_all_pools_from_v2(
-    wss_url: String,
+    rpc_sock: String,
     factory_addresses: Vec<&str>,
     from_blocks: Vec<u64>,
 ) -> Result<Vec<Pool>> {
@@ -84,8 +84,8 @@ pub async fn load_all_pools_from_v2(
         return Ok(pools_vec);
     }
 
-    let ws = Ws::connect(wss_url).await?;
-    let provider = Arc::new(Provider::new(ws));
+    let ipc = Ipc::connect(rpc_sock).await?;
+    let provider = Arc::new(Provider::new(ipc));
 
     let mut dexes_data = Vec::new();
 

@@ -1,5 +1,5 @@
 use anyhow::{Ok, Result};
-use ethers::providers::{Provider, Ws};
+use ethers::providers::{Provider, Ipc};
 use log::info;
 use std::sync::Arc;
 use tokio::sync::broadcast::{self, Sender};

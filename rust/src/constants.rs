@@ -18,6 +18,7 @@ pub fn get_env(key: &str) -> String {
 pub struct Env {
     pub https_url: String,
     pub wss_url: String,
+    pub rpc_sock: String,
     pub chain_id: U64,
     pub private_key: String,
     pub signing_key: String,
@@ -29,6 +30,7 @@ impl Env {
         Env {
             https_url: get_env("HTTPS_URL"),
             wss_url: get_env("WSS_URL"),
+            rpc_sock: get_env("RPC_SOCK"),
             chain_id: U64::from_str(&get_env("CHAIN_ID")).unwrap(),
             private_key: get_env("PRIVATE_KEY"),
             signing_key: get_env("SIGNING_KEY"),

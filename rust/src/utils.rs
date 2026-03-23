@@ -2,7 +2,7 @@ use anyhow::Result;
 use ethers::{
     self,
     abi::{decode, ParamType, Token},
-    providers::{Middleware, Provider, Ws},
+    providers::{Middleware, Provider, Ipc},
     types::{Filter, H160, U256, U64},
 };
 use fern::colors::{Color, ColoredLevelConfig};
@@ -70,7 +70,7 @@ pub fn calculate_next_block_base_fee(
 }
 
 pub async fn get_touched_pool_reserves(
-    provider: Arc<Provider<Ws>>,
+    provider: Arc<Provider<Ipc>>,
     block_number: U64,
 ) -> Result<HashMap<H160, Reserve>> {
     let sync_event = "Sync(uint112,uint112)";

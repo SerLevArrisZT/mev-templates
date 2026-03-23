@@ -1,5 +1,5 @@
 use ethers::{
-    providers::{Provider, Ws},
+    providers::{Provider, Ipc},
     types::{Address, H160, U256},
 };
 use log::info;
@@ -14,7 +14,7 @@ use crate::simulator::UniswapV2Simulator;
 use crate::streams::Event;
 use crate::utils::get_touched_pool_reserves;
 
-pub async fn event_handler(provider: Arc<Provider<Ws>>, event_sender: Sender<Event>) {
+pub async fn event_handler(provider: Arc<Provider<Ipc>>, event_sender: Sender<Event>) {
     /*
     Current addresses are all from the Ethereum network.
     Please change them according to your chain of interest.
@@ -25,7 +25,7 @@ pub async fn event_handler(provider: Arc<Provider<Ws>>, event_sender: Sender<Eve
     let router_addresses = vec!["0xd9e1cE17f2641f24aE83637ab66a2cca9C378B9F"];
     let factory_blocks = vec![10794229u64];
 
-    let pools_vec = load_all_pools_from_v2(env.wss_url.clone(), factory_addresses, factory_blocks)
+    let pools_vec = load_all_pools_from_v2(env.rpc_sock.clone(), factory_addresses, factory_blocks)
         .await
         .unwrap();
     info!("Initial pool count: {}", pools_vec.len());

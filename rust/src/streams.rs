@@ -1,5 +1,5 @@
 use ethers::{
-    providers::{Provider, Ws},
+    providers::{Provider, Ipc},
     types::{Filter, Log, Transaction, U256, U64},
 };
 use ethers_providers::Middleware;
@@ -23,7 +23,7 @@ pub enum Event {
     Log(Log),
 }
 
-pub async fn stream_new_blocks(provider: Arc<Provider<Ws>>, event_sender: Sender<Event>) {
+pub async fn stream_new_blocks(provider: Arc<Provider<Ipc>>, event_sender: Sender<Event>) {
     let stream = provider.subscribe_blocks().await.unwrap();
     let mut stream = stream.filter_map(|block| match block.number {
         Some(number) => Some(NewBlock {
@@ -46,7 +46,7 @@ pub async fn stream_new_blocks(provider: Arc<Provider<Ws>>, event_sender: Sender
     }
 }
 
-pub async fn stream_pending_transactions(provider: Arc<Provider<Ws>>, event_sender: Sender<Event>) {
+pub async fn stream_pending_transactions(provider: Arc<Provider<Ipc>>, event_sender: Sender<Event>) {
     let stream = provider.subscribe_pending_txs().await.unwrap();
     let mut stream = stream.transactions_unordered(256).fuse();
 
@@ -61,7 +61,7 @@ pub async fn stream_pending_transactions(provider: Arc<Provider<Ws>>, event_send
     }
 }
 
-pub async fn stream_uniswap_v2_events(provider: Arc<Provider<Ws>>, event_sender: Sender<Event>) {
+pub async fn stream_uniswap_v2_events(provider: Arc<Provider<Ipc>>, event_sender: Sender<Event>) {
     let filter = Filter::new().event("Sync(uint112,uint112)");
     let mut stream = provider.subscribe_logs(&filter).await.unwrap();
 
