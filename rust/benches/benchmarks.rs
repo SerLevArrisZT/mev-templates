@@ -1,7 +1,7 @@
 use chrono::prelude::*;
 use criterion::{criterion_group, criterion_main, Criterion};
 use ethers::{
-    providers::{Http, Middleware, Provider, Ws},
+    providers::{Http, Middleware, Provider, Ipc},
     types::{
         transaction::eip2930::AccessList, BlockNumber, Bytes, Eip1559TransactionRequest,
         NameOrAddress, H160, U256,
@@ -20,7 +20,7 @@ use rust::pools::load_all_pools_from_v2;
 use rust::streams::{stream_new_blocks, stream_pending_transactions, Event};
 use rust::utils::{calculate_next_block_base_fee, get_touched_pool_reserves};
 
-pub async fn logging_event_handler(_: Arc<Provider<Ws>>, event_sender: Sender<Event>) {
+pub async fn logging_event_handler(_: Arc<Provider<Ipc>>, event_sender: Sender<Event>) {
     let benchmark_file = Path::new("benches/.benchmark.csv");
     let mut writer = csv::Writer::from_path(benchmark_file).unwrap();
 
@@ -41,7 +41,7 @@ pub async fn logging_event_handler(_: Arc<Provider<Ws>>, event_sender: Sender<Ev
     }
 }
 
-pub async fn touched_pools_event_handler(provider: Arc<Provider<Ws>>, event_sender: Sender<Event>) {
+pub async fn touched_pools_event_handler(provider: Arc<Provider<Ipc>>, event_sender: Sender<Event>) {
     let mut event_receiver = event_sender.subscribe();
 
     loop {
@@ -72,7 +72,7 @@ pub async fn touched_pools_event_handler(provider: Arc<Provider<Ws>>, event_send
     }
 }
 
-pub async fn full_course_event_handler(provider: Arc<Provider<Ws>>, event_sender: Sender<Event>) {
+pub async fn full_course_event_handler(provider: Arc<Provider<Ipc>>, event_sender: Sender<Event>) {
     // pass
 }
 
@@ -100,6 +100,10 @@ pub fn benchmark_function(_: &mut Criterion) {
     // runtime for async tasks
     let rt = Runtime::new().unwrap();
 
+    // IPC Provider für Benchmarks
+    let ipc = rt.block_on(Ipc::connect(env.rpc_sock.clone())).unwrap();
+    let provider = Arc::new(Provider::new(ipc));
+
     // 2: Get block info
     let mut runs = 10;
 
@@ -107,7 +111,7 @@ pub fn benchmark_function(_: &mut Criterion) {
     loop {
         let task = async {
             let s = Instant::now();
-            let block = client.clone().get_block(BlockNumber::Latest).await.unwrap();
+            let block = provider.clone().get_block(BlockNumber::Latest).await.unwrap();
             let took = s.elapsed().as_millis();
             println!(
                 "2. New block: #{:?} | Took: {:?} ms",
